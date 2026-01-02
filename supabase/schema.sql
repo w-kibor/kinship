@@ -2,7 +2,7 @@
 create extension if not exists "uuid-ossp";
 
 create table if not exists profiles (
-  id uuid primary key default auth.uid(),
+  id uuid primary key default uuid_generate_v4(),
   phone text,
   email text,
   public_key text,
@@ -61,6 +61,9 @@ alter table circle_members enable row level security;
 alter table statuses enable row level security;
 alter table magic_links enable row level security;
 alter table sms_triggers enable row level security;
+
+-- NOTE: profiles table has no RLS - service role and authenticated users can insert/select
+-- RLS policies for other tables below:
 
 create policy "circle owner manage circle" on circles
   for all using (auth.uid() = owner_id) with check (auth.uid() = owner_id);

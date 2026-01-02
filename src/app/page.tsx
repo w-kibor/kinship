@@ -47,9 +47,8 @@ async function getBattery(): Promise<number | undefined> {
 
 export default function Home() {
   const [note, setNote] = useState("");
-  const [isOnline, setIsOnline] = useState(
-    typeof navigator === "undefined" ? true : navigator.onLine
-  );
+  const [isMounted, setIsMounted] = useState(false);
+  const [isOnline, setIsOnline] = useState(true);
   const queryClient = useQueryClient();
 
   const { data: circle, isFetching, error } = useQuery<CircleStatus[]>({
@@ -59,7 +58,9 @@ export default function Home() {
   });
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    setIsMounted(true);
+    setIsOnline(navigator.onLine);
+
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
 
@@ -113,7 +114,11 @@ export default function Home() {
             One tap (or SMS fallback) to let your Circle of 5 know you are safe. Works offline, queues updates, and shows last-known location when signals fade.
           </p>
           <div className="flex items-center gap-2 text-sm text-indigo-100/80">
-            <span className={isOnline ? "h-2 w-2 rounded-full bg-emerald-400" : "h-2 w-2 rounded-full bg-amber-400"} />
+            {isMounted && (
+              <>
+                <span className={isOnline ? "h-2 w-2 rounded-full bg-emerald-400" : "h-2 w-2 rounded-full bg-amber-400"} />
+              </>
+            )}
             {headline}
           </div>
         </header>
