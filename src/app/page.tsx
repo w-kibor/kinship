@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CircleStatus, SendStatusPayload, fetchStatuses, sendStatus } from "@/lib/status-api";
 import { StatusCard } from "@/components/status-card";
 import { ServiceWorkerClient } from "@/components/service-worker-client";
+import { ManageContacts } from "@/components/manage-contacts";
 
 type StatusKind = "safe" | "help" | "unknown";
 
@@ -49,7 +50,23 @@ export default function Home() {
   const [note, setNote] = useState("");
   const [isMounted, setIsMounted] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
   const queryClient = useQueryClient();
+
+  // Check if setup is complete and get userId
+  useEffect(() => {
+    const setupComplete = localStorage.getItem("kinship_setup_complete");
+    const storedUserId = localStorage.getItem("kinship_user_id");
+    
+    if (!setupComplete) {
+      window.location.href = "/setup";
+      return;
+    }
+    
+    if (storedUserId) {
+      setUserId(storedUserId);
+    }
+  }, []);
 
   const { data: circle, isFetching, error } = useQuery<CircleStatus[]>({
     queryKey: ["circle-status"],
@@ -197,6 +214,9 @@ export default function Home() {
           </p>
         </section>
       </div>
+
+      {/* Manage Contacts Button */}
+      {userId && <ManageContacts userId={userId} />}
     </div>
   );
 }
