@@ -59,18 +59,18 @@ function parseSMSCommand(body: string): {
 
 /**
  * POST /api/webhooks/sms
- * Twilio webhook handler for incoming SMS
- * Expects Twilio's standard webhook format
+ * Africa's Talking webhook handler for incoming SMS
+ * Expects Africa's Talking's standard webhook format
  */
 export async function POST(request: NextRequest) {
   try {
     const supabase = getSupabaseClient();
     
-    // Parse form data from Twilio
+    // Parse form data from Africa's Talking
     const formData = await request.formData();
-    const from = formData.get("From")?.toString() || "";
-    const body = formData.get("Body")?.toString() || "";
-    const messageId = formData.get("MessageSid")?.toString() || "";
+    const from = formData.get("from")?.toString() || "";
+    const body = formData.get("text")?.toString() || "";
+    const messageId = formData.get("id")?.toString() || "";
 
     console.log("SMS webhook received:", { from, body, messageId });
 
@@ -79,13 +79,10 @@ export async function POST(request: NextRequest) {
 
     if (!command || !pin) {
       return new NextResponse(
-        `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Message>Invalid format. Use: SAFE [PIN] or HELP [PIN]</Message>
-</Response>`,
+        "Invalid format. Use: SAFE [PIN] or HELP [PIN]",
         {
           status: 200,
-          headers: { "Content-Type": "text/xml" },
+          headers: { "Content-Type": "text/plain" },
         }
       );
     }
@@ -100,13 +97,10 @@ export async function POST(request: NextRequest) {
     if (triggerError || !trigger) {
       console.error("PIN not found:", pin);
       return new NextResponse(
-        `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Message>Invalid PIN. Please check and try again.</Message>
-</Response>`,
+        "Invalid PIN. Please check and try again.",
         {
           status: 200,
-          headers: { "Content-Type": "text/xml" },
+          headers: { "Content-Type": "text/plain" },
         }
       );
     }
@@ -122,13 +116,10 @@ export async function POST(request: NextRequest) {
     if (memberError || !memberships || memberships.length === 0) {
       console.error("User not in any circles:", userId);
       return new NextResponse(
-        `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Message>You are not part of any circle.</Message>
-</Response>`,
+        "You are not part of any circle.",
         {
           status: 200,
-          headers: { "Content-Type": "text/xml" },
+          headers: { "Content-Type": "text/plain" },
         }
       );
     }
@@ -152,13 +143,10 @@ export async function POST(request: NextRequest) {
     if (insertError) {
       console.error("Failed to insert statuses:", insertError);
       return new NextResponse(
-        `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Message>Failed to update status. Please try again.</Message>
-</Response>`,
+        "Failed to update status. Please try again.",
         {
           status: 200,
-          headers: { "Content-Type": "text/xml" },
+          headers: { "Content-Type": "text/plain" },
         }
       );
     }
@@ -167,25 +155,19 @@ export async function POST(request: NextRequest) {
     const locationText = lat && lng ? ` at ${lat},${lng}` : "";
 
     return new NextResponse(
-      `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Message>Status updated to ${statusText}${locationText}. Your circle has been notified.</Message>
-</Response>`,
+      `Status updated to ${statusText}${locationText}. Your circle has been notified.`,
       {
         status: 200,
-        headers: { "Content-Type": "text/xml" },
+        headers: { "Content-Type": "text/plain" },
       }
     );
   } catch (error) {
     console.error("POST /api/webhooks/sms error:", error);
     return new NextResponse(
-      `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Message>System error. Please try again later.</Message>
-</Response>`,
+      "System error. Please try again later.",
       {
         status: 200,
-        headers: { "Content-Type": "text/xml" },
+        headers: { "Content-Type": "text/plain" },
       }
     );
   }

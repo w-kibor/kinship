@@ -14,8 +14,9 @@ npm run dev
 Copy `.env.local.example` to `.env.local` and fill in real values:
 
 - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase project
-- `SUPABASE_SERVICE_ROLE_KEY` — for backend jobs (not used in the mock API yet)
-- `TWILIO_*`, `KINSHIP_SMS_*` — for SMS webhook glue (not wired yet in this stub)
+- `SUPABASE_SERVICE_ROLE_KEY` — for backend jobs
+- `AFRICASTALKING_API_KEY`, `AFRICASTALKING_USERNAME` — Africa's Talking credentials
+- `KINSHIP_SMS_NUMBER` — Sender ID/shortcode for SMS
 
 ### What’s implemented
 - Next.js 16 (App Router) + TypeScript + Tailwind v4
@@ -31,5 +32,5 @@ Copy `.env.local.example` to `.env.local` and fill in real values:
 
 ### Next steps
 - Wire Supabase tables (profiles/circles/statuses) + RLS, replace mock API route with Supabase edge function.
-- Add Twilio webhook to accept `SAFE <PIN> <LAT,LNG>` SMS and insert status.
+- Configure Africa's Talking webhook to accept `SAFE <PIN> <LAT,LNG>` SMS and insert status.
 - Replace manifest icons with real 192/512 PNGs; tune caching strategy.

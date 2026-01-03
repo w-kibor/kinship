@@ -23,7 +23,7 @@ const alertSchema = z.object({
 
 /**
  * POST /api/sms/alert
- * Send SMS alert to all circle members (requires Twilio)
+ * Send SMS alert to all circle members (requires Africa's Talking)
  */
 export async function POST(request: NextRequest) {
   try {
@@ -93,13 +93,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check for Twilio credentials
-    const twilioSid = process.env.TWILIO_ACCOUNT_SID;
-    const twilioToken = process.env.TWILIO_AUTH_TOKEN;
-    const twilioNumber = process.env.KINSHIP_SMS_NUMBER;
+    // Check for Africa's Talking credentials
+    const atApiKey = process.env.AFRICASTALKING_API_KEY;
+    const atUsername = process.env.AFRICASTALKING_USERNAME;
+    const smsNumber = process.env.KINSHIP_SMS_NUMBER;
 
-    if (!twilioSid || !twilioToken || !twilioNumber) {
-      console.warn("Twilio not configured - SMS alerts disabled");
+    if (!atApiKey || !atUsername || !smsNumber) {
+      console.warn("Africa's Talking not configured - SMS alerts disabled");
       return NextResponse.json(
         {
           error: "SMS service not configured",
@@ -109,21 +109,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Send SMS via Twilio
+    // Send SMS via Africa's Talking
     const results = await Promise.allSettled(
       recipients.map(async (phone: string) => {
         const response = await fetch(
-          `https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`,
+          "https://api.africastalking.com/version1/messaging",
           {
             method: "POST",
             headers: {
               "Content-Type": "application/x-www-form-urlencoded",
-              Authorization: `Basic ${Buffer.from(`${twilioSid}:${twilioToken}`).toString("base64")}`,
+              "apiKey": atApiKey,
+              "Accept": "application/json",
             },
             body: new URLSearchParams({
-              To: phone,
-              From: twilioNumber,
-              Body: message,
+              username: atUsername,
+              to: phone,
+              message: message,
+              from: smsNumber,
             }).toString(),
           }
         );

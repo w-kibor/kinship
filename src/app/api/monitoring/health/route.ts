@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     // Check environment variables
     checks.environment = {
       supabaseConfigured: !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY),
-      twilioConfigured: !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN),
+      africasTalkingConfigured: !!(process.env.AFRICASTALKING_API_KEY && process.env.AFRICASTALKING_USERNAME),
     };
 
     const isHealthy = checks.database === "healthy";
